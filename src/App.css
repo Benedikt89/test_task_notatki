@@ -1,0 +1,153 @@
+.warning {
+    color: orangered;
+}
+
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    box-sizing: border-box;
+    width: 100%;
+    margin-right: auto;
+    margin-left: auto;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    box-sizing: content-box;
+
+    composes: container;
+}
+
+.col {
+    flex-direction: column;
+}
+
+.content-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    background-color: #FFFFFF;
+    height: 100%;
+    margin: 25px;
+    flex-direction: column;
+    width: auto;
+    align-items: center;
+}
+
+.component-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 40px;
+}
+
+.component-header * h4 {
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 28px;
+}
+
+.component-header * span {
+    font-style: normal;
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 22px;
+}
+
+.main-wrapper {
+    margin: 0 auto;
+    display: flex;
+    flex-direction: row;
+    max-width: 1500px;
+    min-height: 100vh;
+}
+
+.main-wrapper > main {
+    background-color: #E5E5E5;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.pop-up-wrapper {
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+
+    display: flex;
+    flex-direction: column;
+
+    min-width: 10rem;
+    min-height: 5rem;
+    margin-left: -80px;
+    padding: 2%;
+
+    transition: all 5s ease-in-out;
+
+    color: red;
+    border: 1px solid red;
+    border-radius: 5%;
+    background-color: black;
+}
+
+.pop-upWrapper ::after {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+
+    margin-left: -5px;
+
+    content: '';
+
+    border-width: 5px;
+    border-style: solid;
+    border-color: #555 transparent transparent transparent;
+}
+
+
+@media (min-width: 1151px) {
+    .container {
+        max-width: 1100px;
+    }
+
+    .App {
+        max-width: 1280px;
+        margin: 0 auto;
+    }
+}
+
+@media (min-width: 992px) and (max-width: 1150px) {
+    .container {
+        max-width: 960px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    .container {
+        max-width: 720px;
+    }
+}
+
+@media (min-width: 576px) and (max-width: 767px) {
+    .container {
+        max-width: 540px;
+    }
+}
+
+@media (max-width: 576px) and (min-width: 300px) {
+    .container,
+    .row {
+        max-width: 350px;
+        padding-right: 5px;
+        padding-left: 5px;
+    }
+}

@@ -1,0 +1,80 @@
+@import '~antd/dist/antd.less';
+
+@primary-color: #00334E;
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #3f3f3f;
+  color: #bababa;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+link {
+  text-decoration: none;
+}
+
+button:focus {
+  outline: 0;
+}
+
+input,
+select,
+textarea {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+
+  display: block;
+
+  width: 100%;
+  max-width: 90%;
+  margin-top: .5rem;
+  padding: .375rem .75rem;
+
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+
+  border-radius: .25rem;
+  background-color: inherit !important;
+  background-clip: padding-box;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  /*-webkit-box-shadow: 0 0 0 30px #ced4da inset !important;*/
+}
+
+input:-webkit-autofill {
+  /*-webkit-text-fill-color: darkgoldenrod !important;*/
+}
+
+::-webkit-scrollbar {
+  background-color: #F0F0F0;
+  width: 20px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey;
+  border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #BCBCBC;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #bababa;
+}
