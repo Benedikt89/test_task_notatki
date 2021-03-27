@@ -1,6 +1,6 @@
 import db from '../firebase';
 import {I_UserData} from "../../types/app-types";
-import {myAvatar} from "../../constants/avatarImages";
+import {getRandomAvatar} from "../../constants/avatarImages";
 
 
 /* ====================
@@ -19,7 +19,7 @@ export const appAPI = {
       let common = doc.data() as I_UserData;
       // check if pass matches
       if (user.password === common.password) {
-        res = {...common, id, avatar: common.avatar ? common.avatar : myAvatar}
+        res = {...common, id, avatar: common.avatar ? common.avatar : getRandomAvatar()}
       }
     });
     // error if no res object

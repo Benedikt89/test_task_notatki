@@ -1,4 +1,8 @@
-.site-page-header-responsive {
-    /*background-color: #00334E;*/
-    /*color: #F0F0F0;*/
+.logo {
+    width: 3rem;
+    height: 3rem;
+}
+.custom-header {
+    background-size: cover;
+    background-repeat: no-repeat;
 }

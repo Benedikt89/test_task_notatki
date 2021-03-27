@@ -5,13 +5,13 @@ import {AppStateType} from "../../redux/store";
 import {SettingOutlined, EditOutlined} from '@ant-design/icons';
 import {selectListsArr} from "../../redux/data/selectors";
 import {onTicketUpdate, onUpdateList} from "../../redux/data/actions";
-import './TickersPage.css';
+import './ticketsView.css';
 import {Collapse, Tooltip} from "antd";
 import {newTicket} from "../../redux/data/reducer";
 import {I_listType} from "../../types/ticket-types";
 import {getLocale} from "../../constants/languageType";
 import Text from "antd/lib/typography/Text";
-import Ticket from "../../components/Ticket";
+import Ticket from "../../components/Ticket/Ticket";
 
 const {Panel} = Collapse;
 
@@ -42,21 +42,19 @@ const TicketPage: React.FC<PageProps> = () => {
 
   return (
     <div>
-      <h1>Notatki</h1>
+      <h1>{getLocale(language, 'ticket_page_header')}</h1>
       <div className="page-wrapper">
         {lists.map(list => (
           <Collapse defaultActiveKey={[list.id]}
                     style={{margin: '0 2rem 3rem 0'}}>
             <Panel
               header={
-
                   <Text style={{fontSize: '1.2rem', maxWidth: '80%'}} editable={{
                     icon: <EditOutlined style={{fontSize: '1rem'}}/>,
                     onChange: (val: string) => updateList({...list, title: val})
                   }}>
                     {list.title}
                   </Text>
-
               }
               key={list.id}
               extra={getExtra(list.id)}

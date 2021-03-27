@@ -12,14 +12,6 @@ export const selectList = (state: AppStateType, listId: string): I_listType => {
   return state.data.list[listId] as I_listType;
 };
 
-export const selectTickersIds = (state: AppStateType, listId: string): string[] => {
-  let list = state.data.list[listId] as I_listType;
-  if (list) {
-    return list.order;
-  }
-  return [];
-};
-
 export const selectUser = (state: AppStateType, userId: string): I_User | null =>
   isUser(state.data.user[userId]);
 

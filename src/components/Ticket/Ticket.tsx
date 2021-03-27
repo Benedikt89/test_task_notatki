@@ -1,21 +1,25 @@
 import * as React from "react";
 import {useCallback, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {AppStateType} from "../redux/store";
-import {DeleteOutlined, EditOutlined, EllipsisOutlined, ClockCircleOutlined, ArrowsAltOutlined} from '@ant-design/icons';
-import './ticketList.css';
-import {Avatar, Button, Card, DatePicker, Dropdown, Menu, Spin, Tooltip, Typography} from "antd";
-import {getLocale} from "../constants/languageType";
-import {selectTicketByKey, selectUser} from "../redux/data/selectors";
-import {onTicketDelete, onTicketMove, onTicketUpdate} from "../redux/data/actions";
-import {hasOwnProperty} from "../types/typeHelpers";
-import {selectFetchingByKey} from "../redux/app/selectors";
+import {AppStateType} from "../../redux/store";
+import {
+  ArrowsAltOutlined,
+  ClockCircleOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  EllipsisOutlined
+} from '@ant-design/icons';
+import './ticket.css';
+import {Button, Card, DatePicker, Dropdown, Menu, Spin, Tooltip, Typography} from "antd";
+import {getLocale} from "../../constants/languageType";
+import {selectTicketByKey} from "../../redux/data/selectors";
+import {onTicketDelete, onTicketMove, onTicketUpdate} from "../../redux/data/actions";
+import {hasOwnProperty} from "../../types/typeHelpers";
+import {selectFetchingByKey} from "../../redux/app/selectors";
 import moment, {Moment} from "moment";
-import {getRandomAvatar} from "../constants/avatarImages";
-
+import {TicketMeta} from "./TicketMeta";
 
 const {Text, Title} = Typography;
-const {Meta} = Card;
 
 interface TicketProps {
   ticketId: string
@@ -83,7 +87,6 @@ const Ticket: React.FC<TicketProps> = ({ticketId}) => {
   ];
 
   const onUpdate = (val: string | Moment) => {
-    console.log('onUpdate => ' + editField);
     if (ticket && editField && val && hasOwnProperty(ticket, editField)) {
       if (typeof val === 'string') {
         if (val !== ticket[editField]) {
@@ -129,7 +132,7 @@ const Ticket: React.FC<TicketProps> = ({ticketId}) => {
         >
           <EllipsisOutlined key="menu"/>
         </Dropdown>}
-        style={{width: 330, margin: '2rem 0.2rem'}}
+        style={{width: 330, margin: '0 1rem 2rem 0.3rem'}}
           actions={[
             <Tooltip
               title={`${ticket.expireTime.format(getLocale(language, 'time_format'))}`}
@@ -149,6 +152,7 @@ const Ticket: React.FC<TicketProps> = ({ticketId}) => {
           ]}
       >
         <div className="ticket-content-wrapper">
+          {/*TODO: replace text with content editable*/}
           <Text
             editable={{
               editing: editField === 'content',
@@ -159,28 +163,12 @@ const Ticket: React.FC<TicketProps> = ({ticketId}) => {
             {ticket.content}
           </Text>
         </div>
-        <CardMeta
+        <TicketMeta
           userId={ticket.lastModifiedId}
           lastModified={`${getLocale(language, 'ticket_meta_last_time')} ${ticket.lastModified.format(getLocale(language, 'time_format'))}`}
         />
       </Card>
     </Spin>
-  )
-};
-
-interface I_MetaProps {
-  lastModified: string,
-  userId: string
-}
-
-const CardMeta: React.FC<I_MetaProps> = ({lastModified, userId}) => {
-  const user = useSelector((state: AppStateType) => selectUser(state, userId));
-  return (
-    <Meta
-      avatar={<Avatar src={user && user.avatar ? user.avatar : getRandomAvatar()}/>}
-      title={user && user.name ? user.name : "no name"}
-      description={lastModified}
-    />
   )
 };
 

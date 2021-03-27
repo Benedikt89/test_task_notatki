@@ -28,21 +28,21 @@ const LoginForm = () => {
       onFinish={onFinish}
     >
       <Form.Item
-        label="login"
+        label={getLocale(language, 'placeholder_name')}
         name="name"
-        rules={[{ required: true, message: 'Please input your Email!', type: 'email' }]}
+        rules={[{ required: true, message: getLocale(language, 'error_name'), type: 'email' }]}
       >
-        <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Username" />
+        <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder={getLocale(language, 'placeholder_name')} />
       </Form.Item>
       <Form.Item
-        label="password"
+        label={getLocale(language, 'placeholder_password')}
         name="password"
-        rules={[{ required: true, message: 'Please input your Password!' }]}
+        rules={[{ required: true, message: getLocale(language, 'error_password') }]}
       >
         <Input.Password
           prefix={<LockOutlined className="site-form-item-icon" />}
           type="password"
-          placeholder="Password"
+          placeholder={getLocale(language, 'placeholder_password')}
         />
       </Form.Item>
 
@@ -51,7 +51,7 @@ const LoginForm = () => {
           {getLocale(language,'log_in')}
         </Button>
         <span style={{float: 'right'}}>
-          Or <Link to={'/register'}>{getLocale(language, 'register_now')}</Link>
+          <Link to={'/register'}>{getLocale(language, 'register_now')}</Link>
         </span>
       </Form.Item>
     </Form>

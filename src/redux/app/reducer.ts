@@ -30,12 +30,21 @@ const appReducer = (state: I_appState = initialState, action: AppActionsType):I_
         };
       } else return state;
     }
+
+    /* ====================
+      setting language
+     ==================== */
+
     case appActionTypes.SET_LANGUAGE: {
       return {
           ...state,
           language: action.key
       };
     }
+
+    /* ====================
+      set error by key
+     ==================== */
     case appActionTypes.SET_ERROR: {
       if (state.error[action.key] && !action.message) {
         let newState = {...state};
@@ -49,13 +58,18 @@ const appReducer = (state: I_appState = initialState, action: AppActionsType):I_
         };
       } else return state;
     }
+
+    /* ====================
+      set user data, or null when log out
+     ==================== */
+
     case appActionTypes.SET_USER_DATA: {
       return {
         ...state,
         userData: action.data
       };
     }
-    //adding fetched data to state
+
     default:
       return state;
   }

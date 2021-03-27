@@ -10,6 +10,7 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import {useState} from "react";
 import {getRandomAvatar} from "../../constants/avatarImages";
 import {Redirect} from "react-router";
+import {getLocale} from "../../constants/languageType";
 
 interface UserFormProps {
   user?: I_UserData | null
@@ -22,9 +23,9 @@ const UserRegisterForm: React.FC<UserFormProps> = ({user}) => {
     loading: selectFetchingByKey(state, 'onUserRegister'),
     userData: selectUserData(state)
   }));
-
-  ///TODO Languages
   const [touched, setTouched] = useState(false);
+  const [registered, setRegistered] = useState(!userData);
+
   const phoneRegExp = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
   const defaultPrefix = "86";
 
@@ -36,7 +37,7 @@ const UserRegisterForm: React.FC<UserFormProps> = ({user}) => {
       phone: `+${values.prefix ? values.prefix : defaultPrefix}-${values.phone}`,
       password: values.password
     }));
-    console.log('Success:', values);
+    setRegistered(true);
   };
 
   const prefixSelector = (
@@ -47,10 +48,6 @@ const UserRegisterForm: React.FC<UserFormProps> = ({user}) => {
       </Select>
     </Form.Item>
   );
-
-  const onFinishFailed = (errorInfo: any) => {
-    console.log('Failed:', errorInfo);
-  };
 
   let getSplittedPhone = (string: string) => {
     let [prefix, ...rest] = string.split("-");
@@ -68,45 +65,46 @@ const UserRegisterForm: React.FC<UserFormProps> = ({user}) => {
     prefix: defaultPrefix,
   };
 
-  return userData ? <Redirect to={'/'} /> : (
+  return userData && registered ? <Redirect to={'/'} /> : (
     <Form
       onValuesChange={() => setTouched(true)}
       name="user"
       initialValues={defaults}
       onFinish={onFinish}
-      onFinishFailed={onFinishFailed}
     >
       <Form.Item
         name="name"
-        rules={[{required: true, message: 'Please input correct email!', type: 'email'}]}
+        rules={[{required: true, message: getLocale(language,'error_name'), type: 'email'}]}
       >
-        <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="e-mail"/>
+        <Input prefix={<UserOutlined className="site-form-item-icon" />}
+               placeholder={'placeholder_name'}/>
       </Form.Item>
 
       <Form.Item
         name="phone"
         rules={[
-          {required: true, message: 'Please input your phone!'},
+          {required: true, message: getLocale(language,'error_phone')},
           {pattern: phoneRegExp,
-            message: 'Please enter a valid Phone *** *** ****',}
+            message: getLocale(language,'error_valid_phone'),}
         ]}
       >
-        <Input addonBefore={prefixSelector} style={{ width: '100%' }} placeholder="Phone" />
+        <Input addonBefore={prefixSelector} style={{ width: '100%' }}
+               placeholder={getLocale(language, 'placeholder_phone')} />
       </Form.Item>
       <Form.Item
         name="password"
-        rules={[{ required: true, message: 'Please input your Password!' }]}
+        rules={[{ required: true, message: getLocale(language,'error_password')}]}
       >
         <Input
           prefix={<LockOutlined className="site-form-item-icon" />}
           type="password"
-          placeholder="Password"
+          placeholder={getLocale(language, 'placeholder_password')}
         />
       </Form.Item>
 
       <Form.Item>
         <Button type="primary" htmlType="submit" loading={loading} disabled={!touched}>
-          Submit
+          {getLocale(language, 'button_submit')}
         </Button>
       </Form.Item>
     </Form>

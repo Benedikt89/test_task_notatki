@@ -38,6 +38,7 @@ const dataReducer = (state: I_dataState = initialState, action: AppActionsType):
       }
       return newState;
     }
+    //merge common data with existing or create new
     case ticketsActionTypes.UPDATE_ITEM_SUCCESS: {
       let newState = {...state};
       if (newState[action.dataType][action.data.id]) {
@@ -51,6 +52,7 @@ const dataReducer = (state: I_dataState = initialState, action: AppActionsType):
 
       return newState;
     }
+    //delete data
     case ticketsActionTypes.DELETE_TICKET_SUCCESS: {
       let newState = {...state};
       delete newState.ticket[action.data.id];

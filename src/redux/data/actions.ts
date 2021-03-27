@@ -50,12 +50,18 @@ export const _setFetchedData = (data: DataPayloadType[], dataType: DataType): I_
   ({type: ticketsActionTypes.SET_FETCHED_DATA, data, dataType});
 
 
-//API ACTIONS
+
+/* ====================
+  thunk actions
+ ==================== */
+
 export const fetchAllData = () =>
   fetchHandler(
     "fetchAllData",
     async (dispatch: ThunkDispatch<{}, {}, AppActionsType>) => {
+      //array of data to fetch
       const datas: DataType[] = ["ticket", "list", "user"];
+      //promiced function
       let fetch = async (type: DataType) => {
         let res = await ticketsAPI[
           type === "ticket" ? "getTickets"
@@ -65,6 +71,7 @@ export const fetchAllData = () =>
           return true;
         }
       };
+      // racing all data
       const success = await Promise.race(datas.map(d => fetch(d)));
       if (success) {
         return true;
@@ -76,10 +83,12 @@ export const onTicketUpdate = (ticket: I_ticket) =>
   fetchHandler(
     `ticket${ticket.id}`,
     async (dispatch: ThunkDispatch<{}, {}, AppActionsType>, getState: GetStateType) => {
+      //if data comes with newId
       let isNew = ticket.id === newTicketId;
       let res;
+      //user data to set who was updating last
       let userData = selectUserData(getState());
-      if (userData) {
+      if (userData && userData.id) {
         if (isNew) {
           res = await ticketsAPI.addTicket({
             ...ticket,
@@ -89,8 +98,10 @@ export const onTicketUpdate = (ticket: I_ticket) =>
         } else {
           res = await ticketsAPI.updateTicket({...ticket, lastModifiedId: userData.id});
         }
+        //after response set data to reducer
         if (res) {
           if (isNew) {
+            //set new note to list arr
             let list = selectList(getState(), ticket.listId);
             let listRes = await ticketsAPI.updateList({...list, order: [res.id, ...list.order]});
             if (listRes) {
@@ -117,11 +128,20 @@ export const onUpdateList = (list: I_listType) =>
 export const onTicketDelete = (data: I_ticket) =>
   fetchHandler(
     `ticket${data.id}`,
-    async (dispatch: ThunkDispatch<{}, {}, AppActionsType>) => {
-      const res = await ticketsAPI.deleteTicket(data);
-      if (res) {
-        dispatch(_deleteTicketSuccess(data));
-        return true;
+    async (dispatch: ThunkDispatch<{}, {}, AppActionsType>, getState: GetStateType) => {
+      let list = selectList(getState(), data.listId);
+      if (list) {
+        const resFrom = await ticketsAPI.updateList({
+          ...list, order: list.order.filter(id => id !== data.id)
+        });
+        if (resFrom) {
+          dispatch(_updateItemSuccess(resFrom, 'list'));
+        }
+        const res = await ticketsAPI.deleteTicket(data);
+        if (res) {
+          dispatch(_deleteTicketSuccess(data));
+          return true;
+        }
       }
     });
 
@@ -131,8 +151,11 @@ export const onTicketMove = (data: I_ticket) =>
     async (dispatch: ThunkDispatch<{}, {}, AppActionsType>, getState: GetStateType) => {
       const lists = selectListsArr(getState());
       let userData = selectUserData(getState());
+      ///list that should update to remove from id's arr
       let removeFrom: I_listType | null  = null;
+      ///list that should update to add new Id to arr
       let addTo: I_listType | null = null;
+      ///listId that should update to add new Id to arr
       let addToId: string = '';
       lists.forEach((l: I_listType )=> {
         if (l.id === data.listId) {

@@ -2,9 +2,10 @@ import * as React from "react";
 import {Avatar, Button, Dropdown, Layout, Menu} from "antd";
 import './Header.css';
 import {Link} from "react-router-dom";
-import {getLocale, LanguageType} from "../../constants/languageType";
+import {getLocale, languagesArr, LanguageType} from "../../constants/languageType";
 import {I_UserData} from "../../types/app-types";
-import {myAvatar} from "../../constants/avatarImages";
+import logo from '../../assets/logo512.png';
+import headerBackground from '../../assets/background-indexed.png';
 
 const {Header} = Layout;
 
@@ -12,18 +13,22 @@ interface I_Props {
   userData: I_UserData | null,
   language: LanguageType,
   logOut: () => void
+  setLanguage: (val: LanguageType) => void
 }
 
 class AppHeader extends React.Component<I_Props> {
 
   render() {
-    const {userData, logOut, language} = this.props;
+    const {userData, logOut, language, setLanguage} = this.props;
     let toDisplay = userData && userData.name.length > 5
       ? [...userData.name.split('')].splice(0, 5).join('')
       : userData ? userData.name : '';
     return (
-      <Header>
-        <div className="logo"/>
+      <Header className="custom-header" style={{backgroundImage: `url(${headerBackground})`}}>
+        <Link to={'/'}>
+          <img src={logo} className="logo" alt={'logo'}/>
+        </Link>
+
         <Link to='/tickets' key="2">
           <Button type="text" style={{color: '#fff'}}>
             {getLocale(language, 'header_tickets')}
@@ -51,13 +56,31 @@ class AppHeader extends React.Component<I_Props> {
         >
           <div style={{float: 'right'}}>
             <Avatar
-              src={userData && userData.avatar ? userData.avatar : myAvatar}
+              src={userData && userData.avatar && userData.avatar}
               style={{backgroundColor: "#2F80ED", verticalAlign: 'middle'}}
               size={40}
               gap={1}
             >
               {toDisplay}
             </Avatar>
+          </div>
+        </Dropdown>
+
+        <Dropdown
+          overlay={<Menu>
+            {languagesArr.map(lang => (
+              <Menu.Item key={lang}>
+                <Button type="text" onClick={() => setLanguage(lang)}>
+                  {lang}
+                </Button>
+              </Menu.Item>
+            ))}
+          </Menu>}
+        >
+          <div style={{float: 'right', marginRight: '1rem'}}>
+            <Button type="text">
+              {language}
+            </Button>
           </div>
         </Dropdown>
       </Header>

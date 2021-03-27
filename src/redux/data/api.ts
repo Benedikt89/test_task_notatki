@@ -8,12 +8,8 @@ const {Timestamp} = firebase.firestore;
 
 const ticketConverter = (data: I_ticket) => {
   return {
-    creatorId: '',
+    ...data,
     lastModified: Timestamp.fromDate(new Date()),
-    lastModifiedId: '',
-    listId: data.listId,
-    title: data.title,
-    content: data.content,
     expireTime: Timestamp.fromDate(data.lastModified.toDate()),
   }
 };

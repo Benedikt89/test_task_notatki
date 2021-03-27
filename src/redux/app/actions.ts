@@ -53,6 +53,11 @@ export const setUserData = (data: I_UserData | null): I_setUserData =>
 export const setLanguage = (key: LanguageType): I_setLanguage =>
   ({type: appActionTypes.SET_LANGUAGE, key});
 
+
+/* ====================
+  thunk actions
+ ==================== */
+
 export const logInThunk = (data: I_LoginData) => fetchHandler(
   'logInThunk',
   async (dispatch: ThunkDispatch<{}, {}, AppActionsType>) => {

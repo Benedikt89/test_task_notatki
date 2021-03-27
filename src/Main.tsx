@@ -10,7 +10,7 @@ import LoginForm from "./views/login/LogInForm";
 import UserRegisterForm from "./views/register/RegisterForm";
 import ProtectedRoute from "./components/common/ProtectedRoute";
 import {I_UserData} from "./types/app-types";
-import {setUserData} from "./redux/app/actions";
+import {setLanguage, setUserData} from "./redux/app/actions";
 import {LanguageType} from "./constants/languageType";
 
 interface I_props {}
@@ -25,6 +25,7 @@ interface I_connectedProps {
 interface I_dispatchedProps {
   fetchAllData: () => void
   setUserData: (data: I_UserData | null) => void
+  setLanguage: (val: LanguageType) => void
 }
 
 interface I_MainProps extends I_props, I_connectedProps, I_dispatchedProps {}
@@ -46,11 +47,14 @@ class Main extends Component<I_MainProps, I_MainState> {
   }
 
   render() {
-    const {setUserData, userData, language} = this.props;
+    const {setUserData, userData, language, setLanguage} = this.props;
     return (
       <div className={"main-wrapper"}>
         <main>
-          <Header userData={userData} language={language} logOut={() => setUserData(null)}/>
+          <Header userData={userData}
+                  setLanguage={setLanguage}
+                  language={language}
+                  logOut={() => setUserData(null)}/>
           <div className={"content-wrapper"}>
             <Switch>
               <Route exact path="/"
@@ -92,7 +96,7 @@ const mapStateToProps = (state: AppStateType): I_connectedProps => {
 };
 
 let ComposedComponent = connect(
-  mapStateToProps, {fetchAllData, setUserData}
+  mapStateToProps, {fetchAllData, setUserData, setLanguage}
 )(Main);
 
 export default ComposedComponent;
