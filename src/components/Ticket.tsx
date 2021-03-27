@@ -1,54 +1,59 @@
 import * as React from "react";
+import {useCallback, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {AppStateType} from "../redux/store";
-import {UserOutlined, DeleteOutlined, CloseCircleOutlined} from '@ant-design/icons';
-import {selectIsEditing, selectTicketByKey} from "../redux/tickets/selectors";
-import TicketForm from "./TicketForm";
+import {DeleteOutlined, EditOutlined, SettingOutlined} from '@ant-design/icons';
 import './ticketList.css';
-import {useCallback} from "react";
-import {onTicketDelete, setEditingTicket} from "../redux/tickets/actions";
+import {Avatar, Card, Typography} from "antd";
+import {getLocale} from "../constants/languageType";
+import {selectTicketByKey} from "../redux/data/selectors";
+import {onTicketDelete} from "../redux/data/actions";
+
+const {Text, Title} = Typography;
+const {Meta} = Card;
 
 interface TicketProps {
   ticketId: string
 }
 
 const Ticket: React.FC<TicketProps> = ({ticketId}) => {
-  const {ticket, isEditing} = useSelector((state:AppStateType) =>
+  const {ticket, language} = useSelector((state: AppStateType) =>
     ({
       ticket: selectTicketByKey(state, ticketId),
-      isEditing: selectIsEditing(state, ticketId)
+      language: state.app.language
     }));
+  const [isEditing, setEditing] = useState(null);
+  const [editVal, setEditVal] = useState('');
   const dispatch = useDispatch();
 
-  const setEditing = useCallback(() => {
-    dispatch(setEditingTicket(isEditing ? null : ticketId))
-  }, [isEditing]);
-
   const deleteItem = useCallback(() => {
-    dispatch(onTicketDelete(ticketId))
+    if (ticket) {
+      dispatch(onTicketDelete(ticket))
+    }
   }, [isEditing]);
 
-  return !ticket ? null : isEditing ? (
-    <div className="ticket-item-wrapper">
-      <TicketForm ticket={ticket}/>
-      <CloseCircleOutlined onClick={setEditing} className="fixed-delete-button"/>
-    </div>
-) : (
-    <div className="ticket-item-wrapper">
-      <UserOutlined className="ticket-info-icon"/>
-      <div className="row ticket-info" onDoubleClick={setEditing}>
-        <span>
-          <small style={{margin: '0 1rem'}}>Name:</small>
-            {ticket.name}
-        </span>
-        <span>
-          <small style={{margin: '0 1rem'}}>Phone:</small>
-          {ticket.phone}
-        </span>
+  return !ticket ? null : (
+    <Card
+      style={{width: 300}}
+      actions={[
+        <SettingOutlined key="setting"/>,
+        <EditOutlined key="edit"/>,
+      ]}
+    >
+      <div className="ticket-item-wrapper">
+
+        <Title editable={{icon: <EditOutlined style={{fontSize: '1rem'}} />, onChange: setEditVal }}>{ticket.title}</Title>
+        <Text editable={{ onChange: setEditVal }}>{editVal}</Text>
+
+        <DeleteOutlined style={{color: "#ff0000"}} onClick={deleteItem} className="fixed-delete-button"/>
       </div>
-    <DeleteOutlined style={{color: "#ff0000"}} onClick={deleteItem} className="fixed-delete-button"/>
-  </div>
-)
+      <Meta
+        avatar={<Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png"/>}
+        title="Card title"
+        description={`Last Time Edited ${ticket.lastModified.format(getLocale(language, 'time_format'))}`}
+      />
+    </Card>
+  )
 };
 
 export default Ticket;

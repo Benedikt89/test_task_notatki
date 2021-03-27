@@ -1,4 +1,5 @@
 const CracoLessPlugin = require('craco-less');
+const { darkTheme } = require('@ant-design/dark-theme');
 
 module.exports = {
     plugins: [
@@ -7,7 +8,7 @@ module.exports = {
             options: {
                 lessLoaderOptions: {
                     lessOptions: {
-                        modifyVars: { '@primary-color': '#00334E' },
+                        modifyVars: darkTheme,
                         javascriptEnabled: true,
                     },
                 },

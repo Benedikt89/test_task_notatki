@@ -1,27 +1,34 @@
 import {hasOwnProperty} from "../types/typeHelpers";
 
-type Locale = 'eng' | 'pl' | 'rus'
+export type LanguageType = 'eng' | 'pl' | 'rus'
 type LocaleObject = {
-  [key in Locale]: {
-    [key: string]: string | string[]
+  [key in LanguageType]: {
+    [key: string]: string
   }
 }
 
+/* ====================
+   locale variables (later can be fetched from API)
+ ==================== */
+
 const localeInterface:LocaleObject = {
   eng: {
+    time_format: 'MM-DD-YYYY, HH:mm',
     header_users: 'Users',
-    header_tickets: 'Tickets'
+    header_tickets: 'Tickets',
+    add_ticket: 'Add new Note to List'
   },
   pl: {
-
+    time_format: 'MM-DD-YYYY, HH:mm',
   },
   rus: {
+    time_format: 'YYYY-MM-DD, HH:mm',
     header_users: 'Пользователи',
     header_stars: 'Заметки'
   }
 };
 
-export const getLocale = (lang: Locale, key: string): string | string[] => {
+export const getLocale = (lang: LanguageType, key: string): string => {
   let language = localeInterface.eng;
   let res = '';
   if (hasOwnProperty(localeInterface, lang)) {

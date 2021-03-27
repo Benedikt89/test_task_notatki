@@ -1,6 +1,8 @@
 @import '~antd/dist/antd.less';
+@import '~antd/lib/style/color/colorPalette.less';
+@import '~antd/lib/style/themes/dark.less';
 
-@primary-color: #00334E;
+//@component-background: #303030;
 
 body {
   margin: 0;
@@ -9,8 +11,6 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #3f3f3f;
-  color: #bababa;
 }
 
 code {
@@ -56,25 +56,4 @@ input:-webkit-autofill:active {
 
 input:-webkit-autofill {
   /*-webkit-text-fill-color: darkgoldenrod !important;*/
-}
-
-::-webkit-scrollbar {
-  background-color: #F0F0F0;
-  width: 20px;
-}
-
-/* Track */
-::-webkit-scrollbar-track {
-  box-shadow: inset 0 0 5px grey;
-  border-radius: 10px;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: #BCBCBC;
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #bababa;
 }

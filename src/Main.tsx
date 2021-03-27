@@ -1,17 +1,15 @@
 import React, {Component} from 'react';
 import {Redirect, Route, Switch} from "react-router";
 import {connect} from "react-redux";
-import TicketList from "./components/TicketList";
 import {selectErrorByKey, selectFetchingByKey} from "./redux/app/selectors";
 import {AppStateType} from "./redux/store";
 import Header from "./components/Header/Header";
-import {fetchTickets} from "./redux/tickets/actions";
+import {fetchTickets} from "./redux/data/actions";
+import TicketPage from "./views/tickers/TickersView";
 
-interface I_props {
-}
+interface I_props {}
 
 interface I_connectedProps {
-  ticketsIds: string[]
   error: { message: string } | null
   isFetching: boolean
 }
@@ -39,7 +37,6 @@ class Main extends Component<I_MainProps, I_MainState> {
   }
 
   render() {
-    let {ticketsIds} = this.props;
     return (
       <div className={"main-wrapper"}>
         <main>
@@ -52,7 +49,7 @@ class Main extends Component<I_MainProps, I_MainState> {
               <Route
                 path="/tickets"
                 component={() => (
-                  <TicketList ticketIds={ticketsIds}/>
+                  <TicketPage />
                 )}
               />
 
@@ -65,9 +62,8 @@ class Main extends Component<I_MainProps, I_MainState> {
   }
 }
 
-const mapStateToProps = (state: AppStateType): I_connectedProps => {
+const mapStateToProps = (state: AppStateType, props: I_props): I_connectedProps => {
   return {
-    ticketsIds: state.tickets.ticketsIds,
     error: selectErrorByKey(state, 'fetchTickets'),
     isFetching: selectFetchingByKey(state, 'fetchTickets'),
   }

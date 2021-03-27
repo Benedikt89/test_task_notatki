@@ -9,7 +9,7 @@ require('./index.less');
 
 const App: React.FC = () => {
   return (
-    <Router>
+    <Router basename={''}>
       <Provider store={store}>
         <Main/>
       </Provider>
