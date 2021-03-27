@@ -1,7 +1,8 @@
 import db from '../firebase';
-import {I_listType, I_ticket} from "../../types/ticket-types";
+import {I_listType, I_ticket, I_User} from "../../types/ticket-types";
 import moment from "moment";
 import firebase from "firebase";
+import {getRandomAvatar} from "../../constants/avatarImages";
 
 const {Timestamp} = firebase.firestore;
 
@@ -13,7 +14,7 @@ const ticketConverter = (data: I_ticket) => {
     listId: data.listId,
     title: data.title,
     content: data.content,
-    expireTime: Timestamp.fromDate(new Date()),
+    expireTime: Timestamp.fromDate(data.lastModified.toDate()),
   }
 };
 
@@ -40,6 +41,16 @@ export const ticketsAPI = {
     console.log(res);
     return res;
   },
+  getUsers: async (): Promise<never | I_User[]> => {
+    let res:I_User[] = [];
+    const snapshot = await  db.collection("users").get();
+    snapshot.forEach((doc) => {
+      let id = doc.id;
+      let user = doc.data() as I_User;
+      res.push({name: user.name, id, avatar: user.avatar ? user.avatar : getRandomAvatar()});
+    });
+    return res;
+  },
   updateList: async (list: I_listType): Promise<never | I_listType> => {
     await db.collection("tickerList").doc(list.id).set(list);
     return list;
@@ -52,8 +63,8 @@ export const ticketsAPI = {
     }
   },
   async updateTicket(ticket: I_ticket): Promise<never | I_ticket> {
-    await db.collection("tickets").doc(ticket.id).set(ticket);
-    return ticket;
+    await db.collection("tickets").doc(ticket.id).set(ticketConverter(ticket));
+    return {...ticket, lastModified: moment()};
   },
   async deleteTicket(ticket: I_ticket): Promise<never | boolean> {
     await db.collection("tickets").doc(ticket.id).delete();

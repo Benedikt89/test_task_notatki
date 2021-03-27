@@ -1,8 +1,8 @@
 import {ticketsActionTypes} from "./actions";
-import {I_dataState, I_listType, I_ticket} from "../../types/ticket-types";
+import {DataPayloadType, I_dataState, I_listType} from "../../types/ticket-types";
 import {AppActionsType} from "../store";
 import moment from "moment";
-import {isTicket} from "../../types/typeHelpers";
+import {isList} from "../../types/typeHelpers";
 
 export const newTicketId = '_NEW_TICKET';
 
@@ -18,55 +18,46 @@ export const newTicket = {
 };
 
 const initialState:I_dataState = {
-  tickets: {
+  ticket: {
     [newTicketId]: newTicket
   },
-  lists: {},
+  user: {},
+  list: {},
 };
 
 const dataReducer = (state: I_dataState = initialState, action: AppActionsType): I_dataState => {
   switch (action.type) {
     //adding fetched data
-    case ticketsActionTypes.SET_FETCHED_TICKETS: {
+    case ticketsActionTypes.SET_FETCHED_DATA: {
       let newState = {...state};
-      action.data.forEach((d: I_ticket) => {
-        newState.tickets[d.id] = d;
-        if (newState.lists[d.listId] && !newState.lists[d.listId].order.includes(d.id)) {
-          newState.lists[d.listId].order.push(d.id)
-        }
+      action.data.forEach((d: DataPayloadType) => {
+        newState[action.dataType][d.id] = d;
       });
-      return newState;
-    }
-    case ticketsActionTypes.SET_FETCHED_LISTS: {
-      let newState = {...state};
-      action.data.forEach((d: I_listType) => {
-        newState.lists[d.id] = d;
-      });
+      if (action.dataType === 'user') {
+        console.log(newState)
+      }
       return newState;
     }
     case ticketsActionTypes.UPDATE_ITEM_SUCCESS: {
       let newState = {...state};
-      let newData = action.dataType === 'ticket' ? {...state.tickets} : {...state.lists};
-      let ticket = isTicket(action.data) ? action.data : null;
-      if (newData[action.data.id]) {
-        newData[action.data.id] = {
-          ...newData[action.data.id],
+      if (newState[action.dataType][action.data.id]) {
+        newState[action.dataType][action.data.id] = {
+          ...newState[action.dataType][action.data.id],
           ...action.data
-        }
-      } else if (ticket) {
-        if (newState.lists[ticket.listId] && !newState.lists[ticket.listId].order.includes(ticket.id)) {
-          newState.lists[ticket.listId].order.push(ticket.id)
-        }
-        newState.tickets[ticket.id] = ticket
+        };
+      } else {
+        newState[action.dataType][action.data.id] = action.data;
       }
+
       return newState;
     }
     case ticketsActionTypes.DELETE_TICKET_SUCCESS: {
       let newState = {...state};
-      delete newState.tickets[action.data.id];
-      if (newState.lists[action.data.listId]) {
-        newState.lists[action.data.listId].order =
-          newState.lists[action.data.listId].order.filter(id => id !== action.data.id)
+      delete newState.ticket[action.data.id];
+      let list:I_listType | null = isList(newState.list[action.data.listId]);
+      if (list) {
+        list.order = list.order.filter(id => id !== action.data.id);
+        newState.list[list.id] = list;
       }
       return newState;
     }

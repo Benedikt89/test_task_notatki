@@ -32,7 +32,6 @@
 .content-wrapper {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
     height: 100%;
     margin: 25px;
     flex-direction: column;

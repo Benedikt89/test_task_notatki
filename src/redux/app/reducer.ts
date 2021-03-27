@@ -4,10 +4,13 @@ import {
 import {I_appState} from "../../types/app-types";
 import {AppActionsType} from "../store";
 
+export const newUserId = '_NEW_USER_ID';
+
 const initialState: I_appState = {
   isFetching: {},
   error: {},
-  language: 'eng'
+  language: 'eng',
+  userData: null
 };
 
 
@@ -45,6 +48,12 @@ const appReducer = (state: I_appState = initialState, action: AppActionsType):I_
           error: {...state.error, [action.key]: {message: action.message}},
         };
       } else return state;
+    }
+    case appActionTypes.SET_USER_DATA: {
+      return {
+        ...state,
+        userData: action.data
+      };
     }
     //adding fetched data to state
     default:

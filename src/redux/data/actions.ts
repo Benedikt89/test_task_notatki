@@ -4,37 +4,28 @@ import {DataPayloadType, DataType, I_listType, I_ticket} from "../../types/ticke
 import {ticketsAPI} from "./api";
 import {fetchHandler} from "./fetchHandler";
 import {newTicketId} from "./reducer";
-import {selectList} from "./selectors";
+import {selectList, selectListsArr} from "./selectors";
+import {selectUserData} from "../app/selectors";
+import {batch} from "react-redux";
 
 export const ticketsActionTypes: {
-  SET_FETCHED_TICKETS: 'tickets/SET_FETCHED_TICKETS'
-  SET_FETCHED_LISTS: 'tickets/SET_FETCHED_LISTS'
-  SET_EDITING_TICKET: 'tickets/SET_EDITING_TICKET'
-  UPDATE_ITEM_SUCCESS: 'tickets/UPDATE_ITEM_SUCCESS'
-  DELETE_TICKET_SUCCESS: 'tickets/DELETE_TICKET_SUCCESS'
+  SET_FETCHED_DATA: "tickets/SET_FETCHED_DATA"
+  UPDATE_ITEM_SUCCESS: "tickets/UPDATE_ITEM_SUCCESS"
+  DELETE_TICKET_SUCCESS: "tickets/DELETE_TICKET_SUCCESS"
 } = {
-  SET_FETCHED_TICKETS: 'tickets/SET_FETCHED_TICKETS',
-  SET_FETCHED_LISTS: 'tickets/SET_FETCHED_LISTS',
-  SET_EDITING_TICKET: 'tickets/SET_EDITING_TICKET',
-  UPDATE_ITEM_SUCCESS: 'tickets/UPDATE_ITEM_SUCCESS',
-  DELETE_TICKET_SUCCESS: 'tickets/DELETE_TICKET_SUCCESS'
+  SET_FETCHED_DATA: "tickets/SET_FETCHED_DATA",
+  UPDATE_ITEM_SUCCESS: "tickets/UPDATE_ITEM_SUCCESS",
+  DELETE_TICKET_SUCCESS: "tickets/DELETE_TICKET_SUCCESS"
 };
 
-export type I_dataActions = I_setFetchedTickets | I_setEditingTicket | I_updateItemSuccess |
-  I_deleteTicketSuccess | I_setFetchedLists
+export type I_dataActions = I_setFetchedData | I_updateItemSuccess |
+  I_deleteTicketSuccess
 
 //interfaces
-interface I_setFetchedTickets {
-  type: typeof ticketsActionTypes.SET_FETCHED_TICKETS,
-  data: Array<I_ticket>
-}
-interface I_setFetchedLists {
-  type: typeof ticketsActionTypes.SET_FETCHED_LISTS,
-  data: Array<I_listType>
-}
-interface I_setEditingTicket {
-  type: typeof ticketsActionTypes.SET_EDITING_TICKET,
-  data: string | null
+interface I_setFetchedData {
+  type: typeof ticketsActionTypes.SET_FETCHED_DATA,
+  data: Array<DataPayloadType>
+  dataType: DataType
 }
 interface I_updateItemSuccess {
   type: typeof ticketsActionTypes.UPDATE_ITEM_SUCCESS,
@@ -48,8 +39,6 @@ interface I_deleteTicketSuccess {
 }
 
 //Internal ACTIONS CREATORS
-export const setEditingTicket = (ticket: string | null): I_setEditingTicket =>
-  ({type: ticketsActionTypes.SET_EDITING_TICKET, data: ticket});
 
 export const _updateItemSuccess = (data: DataPayloadType, dataType: DataType): I_updateItemSuccess =>
   ({type: ticketsActionTypes.UPDATE_ITEM_SUCCESS, data, dataType});
@@ -57,23 +46,27 @@ export const _updateItemSuccess = (data: DataPayloadType, dataType: DataType): I
 export const _deleteTicketSuccess = (data: I_ticket): I_deleteTicketSuccess =>
   ({type: ticketsActionTypes.DELETE_TICKET_SUCCESS, data});
 
-export const _setFetchedTickets = (data: I_ticket[]): I_setFetchedTickets =>
-  ({type: ticketsActionTypes.SET_FETCHED_TICKETS, data});
-
-export const _setFetchedLists = (data: I_listType[]): I_setFetchedLists =>
-  ({type: ticketsActionTypes.SET_FETCHED_LISTS, data});
+export const _setFetchedData = (data: DataPayloadType[], dataType: DataType): I_setFetchedData =>
+  ({type: ticketsActionTypes.SET_FETCHED_DATA, data, dataType});
 
 
 //API ACTIONS
-export const fetchTickets = () =>
+export const fetchAllData = () =>
   fetchHandler(
-    'fetchTickets',
+    "fetchAllData",
     async (dispatch: ThunkDispatch<{}, {}, AppActionsType>) => {
-      const res = await ticketsAPI.getTickets();
-      const lists = await ticketsAPI.getLists();
-      if (res) {
-        dispatch(_setFetchedTickets(res));
-        dispatch(_setFetchedLists(lists));
+      const datas: DataType[] = ["ticket", "list", "user"];
+      let fetch = async (type: DataType) => {
+        let res = await ticketsAPI[
+          type === "ticket" ? "getTickets"
+          : type === "list" ? "getLists" : "getUsers"]();
+        if (res) {
+          dispatch(_setFetchedData(res, type));
+          return true;
+        }
+      };
+      const success = await Promise.race(datas.map(d => fetch(d)));
+      if (success) {
         return true;
       }
   });
@@ -81,44 +74,92 @@ export const fetchTickets = () =>
 
 export const onTicketUpdate = (ticket: I_ticket) =>
   fetchHandler(
-    'ticket',
+    `ticket${ticket.id}`,
     async (dispatch: ThunkDispatch<{}, {}, AppActionsType>, getState: GetStateType) => {
       let isNew = ticket.id === newTicketId;
       let res;
-      if (isNew) {
-        res = await ticketsAPI.addTicket(ticket);
-      } else {
-        res = await ticketsAPI.updateTicket(ticket);
-      }
-      if (res) {
+      let userData = selectUserData(getState());
+      if (userData) {
         if (isNew) {
-          let list = selectList(getState(), ticket.listId);
-          onUpdateList({...list, order: [res.id, ...list.order]})
+          res = await ticketsAPI.addTicket({
+            ...ticket,
+            creatorId: userData.id,
+            lastModifiedId: userData.id,
+          });
+        } else {
+          res = await ticketsAPI.updateTicket({...ticket, lastModifiedId: userData.id});
         }
-
-        dispatch(_updateItemSuccess(res, 'ticket'));
-        return true;
+        if (res) {
+          if (isNew) {
+            let list = selectList(getState(), ticket.listId);
+            let listRes = await ticketsAPI.updateList({...list, order: [res.id, ...list.order]});
+            if (listRes) {
+              dispatch(_updateItemSuccess({...list, order: [res.id, ...list.order]}, "list"));
+            }
+          }
+          dispatch(_updateItemSuccess(res, "ticket"));
+          return true;
+        }
       }
     });
 
 export const onUpdateList = (list: I_listType) =>
   fetchHandler(
-    'updateList',
+    "updateList",
     async (dispatch: ThunkDispatch<{}, {}, AppActionsType>) => {
       const res = await ticketsAPI.updateList(list);
       if (res) {
-        dispatch(_updateItemSuccess(res, 'list'));
+        dispatch(_updateItemSuccess(res, "list"));
         return true;
       }
     });
 
 export const onTicketDelete = (data: I_ticket) =>
   fetchHandler(
-    'ticket',
+    `ticket${data.id}`,
     async (dispatch: ThunkDispatch<{}, {}, AppActionsType>) => {
       const res = await ticketsAPI.deleteTicket(data);
       if (res) {
         dispatch(_deleteTicketSuccess(data));
         return true;
       }
+    });
+
+export const onTicketMove = (data: I_ticket) =>
+  fetchHandler(
+    `ticket${data.id}`,
+    async (dispatch: ThunkDispatch<{}, {}, AppActionsType>, getState: GetStateType) => {
+      const lists = selectListsArr(getState());
+      let userData = selectUserData(getState());
+      let removeFrom: I_listType | null  = null;
+      let addTo: I_listType | null = null;
+      let addToId: string = '';
+      lists.forEach((l: I_listType )=> {
+        if (l.id === data.listId) {
+          ///set list that should be cleared
+          removeFrom = {...l, order: l.order.filter(id => id !== data.id)};
+        } else {
+          ///set list where to add
+          addTo = {...l, order: [data.id, ...l.order]} as I_listType;
+          addToId = l.id;
+        }
+      });
+      ///if we have both lists
+      if (removeFrom && addToId && addTo && userData) {
+        const res = await ticketsAPI.updateTicket({
+          ...data, listId: addToId,
+          lastModifiedId: userData.id
+        });
+        const resFrom = await ticketsAPI.updateList(removeFrom);
+        const resTo = await ticketsAPI.updateList(addTo);
+        if (res && resFrom && resTo) {
+          batch(() => {
+            dispatch(_updateItemSuccess(res, 'ticket'));
+            dispatch(_updateItemSuccess(resFrom, 'list'));
+            dispatch(_updateItemSuccess(resTo, 'list'));
+          });
+          return true;
+        }
+      }
+
     });

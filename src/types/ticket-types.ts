@@ -1,14 +1,11 @@
 import {Moment} from "moment";
 
-export type DataType = 'list' | 'ticket'
-export type DataPayloadType = I_listType | I_ticket
+export type DataType = 'list' | 'ticket' | 'user'
+export type DataPayloadType = I_listType | I_ticket | I_User
 
 export type I_dataState = {
-  tickets: {
-    [key: string]: I_ticket
-  }
-  lists: {
-    [key: string]: I_listType
+  readonly [key in DataType]: {
+    [key: string]: DataPayloadType
   }
 }
 
@@ -30,4 +27,10 @@ export type I_listType = {
   id: string,
   order: string[],
   title: string,
+}
+
+export type I_User = {
+  id: string,
+  name: string,
+  avatar: string
 }

@@ -4,12 +4,19 @@ import {selectFetchingByKey} from "../app/selectors";
 import {batch} from "react-redux";
 import {_setError, _setFetching} from "../app/actions";
 import {message} from "antd";
+import {getLocale} from "../../constants/languageType";
+
+
+/* ====================
+   function that covers all request actions with errors etc.
+ ==================== */
 
 export function fetchHandler(key: string, callback: (
   dispatch: ThunkDispatch<{}, {}, AppActionsType>,
   getState: GetStateType,
   ) => Promise<boolean | undefined>) {
   return async function (dispatch: ThunkDispatch<{}, {}, AppActionsType>, getState: GetStateType) {
+    const language = getState().app.language;
     try {
       const loading = selectFetchingByKey(getState(), key);
       if (!loading) {
@@ -26,9 +33,10 @@ export function fetchHandler(key: string, callback: (
         });
       }
     } catch (e) {
-      console.log(e);
-      const content = e.data?.message ? e.data?.message : 'Something went wrong. Try again later.';
-      message.error(content);
+      const content = e.message ? e.message : e.data?.message ? e.data?.message
+        : 'Something went wrong. Try again later.';
+      let locErr = getLocale(language, content);
+      message.error(locErr);
       batch(() => {
         dispatch(_setError(key, content));
         dispatch(_setFetching(key, false));

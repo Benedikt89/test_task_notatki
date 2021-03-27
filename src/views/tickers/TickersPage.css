@@ -1,6 +1,5 @@
 .page-wrapper {
     display: flex;
-    flex-direction: column;
-    width: 100%;
+    flex-wrap: wrap;
     height: 100%;
 }

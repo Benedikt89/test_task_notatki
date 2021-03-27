@@ -3,28 +3,13 @@
     flex-direction: column;
     min-height: 80vh;
 }
-.ticker-list-wrapper {
-    display: flex;
-    flex-direction: column;
-    background-color: #E5E5E5;
-    min-height: 80vh;
-    margin: 20px;
-    padding: 20px;
+.ticket-list-wrapper {
+    max-height: 70vh;
     overflow-y: auto;
 }
 
-.ticker-item-wrapper {
-    display: flex;
-    position: relative;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-    padding: 10px;
-    min-width: 520px;
-    background-color: #F1F5F8;
-    align-items: center;
-    margin-bottom: 1.2rem;
-    border-radius: 1rem;
+.ticket-content-wrapper {
+    margin: 1rem 0;
 }
 .ticker-info-icon {
     margin: 0 1rem;
